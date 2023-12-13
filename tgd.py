@@ -1,7 +1,7 @@
 from pyrogram import Client
 from os.path import exists
 from os import remove
-from sys import stdout
+from sys import stdout, exit
 
 configfile = "tgd.txt"
 
