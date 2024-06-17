@@ -5,3 +5,4 @@ tgd.spec
 build/*
 dist/*
 downloads
+__pycache__

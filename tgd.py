@@ -1,44 +1,12 @@
 from pyrogram import Client
 from pyrogram.types import User, Message
 from os.path import exists
-from os import system, name as osname
-from sys import stdout, exit
-
-configfile = "tgd.txt"
-TGD = """
-  ▄██████▄    ▄██████▄    ████████▄
- ██▀▀███▀▀██  ███    ███  ███   ▀███
-	 ███      ███    █▀   ███    ███
-	 ███     ▄███         ███    ███
-	 ███    ▀▀███ ████▄   ███    ███
-	 ███      ███    ███  ███    ███
-	 ███      ███    ███  ███   ▄███
-	▄████    ████████▀   ████████▀
-"""
-
-system("cls" if osname == "nt" else "clear")
-print(TGD)
-print("	TeleGram Downloader\n")
+from typing import Tuple
+from utils import wait, progress, get_media_type, print_dowload_msg, configfile, print_examples
+from uuid import uuid4
 
 
-def wait():
-    try:
-        input("Press enter to exit...")
-    except KeyboardInterrupt:
-        pass
-    finally:
-        exit(0)
-
-
-def progress(current, total, length=100):
-    progress_percent = current * 100 / total
-    completed = int(length * current / total)
-    bar = f"[{'#' * completed}{' ' * (length - completed)}] {progress_percent:.1f}%"
-    stdout.write(f"\r{bar}")
-    stdout.flush()
-
-
-def preProcess():
+def preProcess() -> Tuple[str, str, str]:
     if not exists(configfile):
         try:
             login = input(
@@ -61,6 +29,7 @@ def preProcess():
                 print()
             with open(configfile, "w") as file:
                 file.write(api_id + "\n" + api_hash + "\n" + ss)
+            return api_id, api_hash, ss
         except KeyboardInterrupt:
             print("\nKeyboard interrupt detected. Exiting...")
             wait()
@@ -79,7 +48,7 @@ def preProcess():
 
 
 def handleEverything():
-    link = input("\nEnter the post link: ")
+    link = input("\nEnter a message/post link: ")
     print()
 
     ################
@@ -110,9 +79,14 @@ def handleEverything():
             print("Message not found:", chatid, "/", msgid, "Skipping...\n")
             continue
 
-        print("Downloding:", msgid, f"({(msgid - fromID + 1)}/{total})")
+        media = get_media_type(msg)
+        if media:
+            print_dowload_msg(media, msgid, fromID, total)
+        else:
+            print("Text Content", f"({(msgid - fromID + 1)}/{total})")
         try:
-            file = acc.download_media(msg, progress=progress)
+            file = acc.download_media(
+                msg, progress=progress, progress_args=(uuid4(),))
             print("\nSaved at", file, "\n")
         except ValueError as e:
             if str(e) == "This message doesn't contain any downloadable media":
@@ -132,14 +106,7 @@ def main():
             print(
                 f"Logged in as: {me.first_name}{(' ' + me.last_name) if me.last_name else ''}{(' - @' + me.username) if me.username else ''} ({me.id})")
 
-            print("""
-	Examples:
-
-		https://t.me/xxxx/1423
-		https://t.me/c/xxxx/10
-		https://t.me/xxxx/1001-1010
-		https://t.me/c/xxxx/101 - 120""")
-
+            print_examples()
             while True:
                 handleEverything()
                 cont = input("Do you wish to continue? (y/n): ")
