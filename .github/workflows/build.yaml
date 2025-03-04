@@ -29,7 +29,7 @@ jobs:
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
-        run: build.bat
+        run: cmd /c build.bat
 
       - name: Upload artifact (Windows)
         if: runner.os == 'Windows'
