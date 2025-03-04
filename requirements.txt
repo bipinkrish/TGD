@@ -1,2 +1,2 @@
-pyrogram
-tgcrypto
+https://github.com/KurimuzonAkuma/pyrogram/archive/v2.1.22.zip # pyrogram
+PyroTgCrypto==1.2.6a0 # tgcrypto
