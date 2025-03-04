@@ -99,7 +99,7 @@ TGD = """
      ███      ███    ███  ███   ▄███
     ▄████    ████████▀   ████████▀
 """
-VERSION = "1.2"
+VERSION = "1.3"
 
 system("cls" if osname == "nt" else "clear")
 print(TGD)
