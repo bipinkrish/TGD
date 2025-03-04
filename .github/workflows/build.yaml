@@ -1,0 +1,46 @@
+name: Build TGD Executables
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: chmod +x build.sh && ./build.sh
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: build.bat
+
+      - name: Upload artifact (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v3
+        with:
+          name: tgd-windows
+          path: tgd.exe
+
+      - name: Upload artifact (Linux/macOS)
+        if: runner.os != 'Windows'
+        uses: actions/upload-artifact@v3
+        with:
+          name: tgd-${{ runner.os }}
+          path: tgd
